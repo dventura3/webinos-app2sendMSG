@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    	<meta charset="ISO-8859-1">
+        <title>App2sendMSG - Receiver</title>
+
+        <!-- my JAVASCRIPT -->
+        <script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery-ui-1.8.21.custom.min.js"></script>
+        <script type="text/javascript" src="js/main.js"></script>
+        <script src="/webinos.js"></script>
+
+    </head>
+    <body>
+
+        <h1>Channel Creator</h1>
+
+        <input type="text" id="txtNamespaceChannel" value="urn:webinos-org:mychannel">
+        <button id="btnCreateChannel">Create Channel</button>
+
+        <br><br><br>
+
+        <textarea id="messagesReceived" rows="4" cols="100"></textarea>
+
+        <br><br><br>
+
+        <input type="text" id="txtMessage" value="">
+        <button id="btnSendMessage">Send Message</button>
+
+    </body>
+</html>
