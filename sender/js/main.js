@@ -81,7 +81,10 @@ function connectToChannel(channelProxy){
         requestInfo,
         // callback invoked to receive messages, only after successful connect
         function(message) {
-            console.log("[CLIENT] Client received message from creator: " + message.contents);
+
+        	//alert("message.contents.cont: " + message.contents.cont + "message.contents.type: " + message.contents.type);
+
+            console.log("[CLIENT] Client received message from creator: " + message.contents.cont);
             // we directly reply to the message, and here we send a message to
             // the sender only (i.e. the creator in this example)
             num_msg++;
@@ -101,11 +104,16 @@ function connectToChannel(channelProxy){
 
 function printMSG(msg, num_msg){
 	console.log("[CLIENT] New MSG received");
-	$('#messagesReceived').append(num_msg+' - ' + JSON.stringify(msg.from) + ' : ' + msg.contents + "\n");
+	$('#messagesReceived').append(num_msg+' - ' + JSON.stringify(msg.from) + ' : ' + msg.contents.cont + "\n");
 }
 
 
 function sendMessageTo(message) {
+
+	msg = {};
+	msg.type = "print";
+	msg.function = "";
+	msg.cont = message;
 	
 	if (typeof clientChannelProxy === "undefined") {
         alert("[CLIENT] You first have to connect to the channel.");
@@ -114,7 +122,7 @@ function sendMessageTo(message) {
 
     //send to all client connected to channel
     clientChannelProxy.send(
-        message,
+        msg,
         // callback invoked when the message is accepted for processing
         function(success) {
             // ok, but no action needed in our example

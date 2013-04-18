@@ -87,11 +87,16 @@ function createChannel(urn){
 }
 
 function printMSG(msg, num_msg){
-	console.log("[CREATOR] New MSG received");
-	$('#messagesReceived').append(num_msg+' - ' + JSON.stringify(msg.from) + ' : ' + msg.contents + "\n");
+	console.log("[CLIENT] New MSG received");
+	$('#messagesReceived').append(num_msg+' - ' + JSON.stringify(msg.from) + ' : ' + msg.contents.cont + "\n");
 }
 
 function sendMessageTo(message) {
+
+	msg = {};
+	msg.type = "print";
+	msg.function = "";
+	msg.cont = message;
 	
 	if (typeof creatorChannelProxy === "undefined") {
         alert("[CREATOR] You first have to connect to the channel.");
@@ -100,7 +105,7 @@ function sendMessageTo(message) {
 
     //send to all client connected to channel
     creatorChannelProxy.send(
-        message,
+        msg,
         // callback invoked when the message is accepted for processing
         function(success) {
             // ok, but no action needed in our example
