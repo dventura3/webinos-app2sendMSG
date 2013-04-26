@@ -2,12 +2,13 @@
 
 var app2app;
 var clientChannelProxy;
+var boxes;
+var services = {};
 
 jQuery(document).ready(function() {
 
     webinos.discovery.findServices({"api": "http://webinos.org/api/app2app"}, {
 		onFound: function (service) {
-			//alert("[CLIENT] App2App");
 			service.bindService({
                 onBind: function () {
                     app2app = service;
@@ -29,6 +30,27 @@ jQuery(document).ready(function() {
     	var message = $('#txtMessage').val();
     	sendMessageTo(message);
 	});
+
+
+
+    boxes = new BoxHandler();
+
+
+    $('#btnCreateService').click(function() {
+        var all_boxes = $('#target').children();
+        for(var i = 0;i<all_boxes.length; i++) {
+            alert(all_boxes[i].id);
+            var child = $("#"+all_boxes[i].id).children();
+            for(var j = 0;j<child.length; j++){
+                if(child[j].id == "sensor_select"){
+                    //var sid = sem.deserialize(child[j].value);
+                    var service = services && services[child[j].value];
+                    //alert(child[j].value);
+                    alert(JSON.stringify(service));
+                }
+            }
+        }
+    });
 
 });
 
@@ -133,4 +155,31 @@ function sendMessageTo(message) {
             alert("[CLIENT] Could not send message: " + error.message);
         }
     );
+}
+
+var make_operation = function(parameter_1, parameter_2, operation){
+    switch (operation){
+        case "sum":
+            return parseInt(parameter_1) + parseInt(parameter_2);
+        case "subtraction":
+            return parseInt(parameter_1) - parseInt(parameter_2);
+        case "multiplication":
+            return parseInt(parameter_1) * parseInt(parameter_2);
+        case "division":
+            return parseInt(parameter_1) / parseInt(parameter_2);
+        default:
+            return 0;
+    }
+}
+
+function btn_operation(){
+    $("#operation_result").empty();
+
+    var par1 = $("#parameter_1").val();
+    var par2 = $("#parameter_2").val();
+    var value_selected = document.getElementById('operation_select').value;
+
+    var result = make_operation(par1,par2,value_selected);
+
+    $("#operation_result").append(result);
 }
