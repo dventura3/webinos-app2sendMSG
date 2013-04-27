@@ -3,6 +3,7 @@
 var app2app;
 var clientChannelProxy;
 var boxes;
+var sHandler;
 var services = {};
 
 jQuery(document).ready(function() {
@@ -34,6 +35,7 @@ jQuery(document).ready(function() {
 
 
     boxes = new BoxHandler();
+    sHandler = new ServiceHandler();
 
 
     $('#btnCreateService').click(function() {
@@ -42,16 +44,24 @@ jQuery(document).ready(function() {
             alert(all_boxes[i].id);
 
             //es: sensorGUI_1 split result --> sensorGUI  and  1
+            var box_type = all_boxes[i].id.split("_")[0];
 
-            var child = $("#"+all_boxes[i].id).children();
-            for(var j = 0;j<child.length; j++){
-                if(child[j].id == "sensor_select"){
-                    //var sid = sem.deserialize(child[j].value);
-                    var service = services && services[child[j].value];
-                    //alert(child[j].value);
-                    alert(JSON.stringify(service));
+            if(box_type == "sensorGUI"){
+                var child = $("#"+all_boxes[i].id).children();
+                for(var j = 0;j<child.length; j++){
+                    if(child[j].id == "sensor_select"){
+                        //var sid = sem.deserialize(child[j].value);
+                        var service = services[child[j].value];
+                        //alert(child[j].value);
+                        alert(JSON.stringify(service));
+
+                        getSensorValue(120,500,"fixedinterval",service);
+                        
+                    }
                 }
             }
+
+            
         }
     });
 

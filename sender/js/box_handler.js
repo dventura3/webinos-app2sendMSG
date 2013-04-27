@@ -1,6 +1,5 @@
 BoxHandler = function() {
    	num_boxes = 0;
-   	myboxes = {};
    	this.findAllServices();
    	this.setInitBoxes();
 };
@@ -100,20 +99,7 @@ var GUIOperationBox = function(){
 }
 
 
-BoxHandler.prototype.make_operation = function(parameter_1, parameter_2, operation){
-    switch (operation){
-        case "sum":
-            return parseInt(parameter_1) + parseInt(parameter_2);
-        case "subtraction":
-            return parseInt(parameter_1) - parseInt(parameter_2);
-        case "multiplication":
-            return parseInt(parameter_1) * parseInt(parameter_2);
-        case "division":
-            return parseInt(parameter_1) / parseInt(parameter_2);
-        default:
-            return 0;
-    }
-}
+
 
 /*****************     SENSOR   ******************/
 
@@ -147,7 +133,7 @@ var GUISensorBox = function(){
     }
 }
 
-BoxHandler.prototype.sensorBoxHandler = function(){
+BoxHandler.prototype.sensorBoxHandler = function(sid){
 	//var idSensor_selected = document.getElementById('sensor_select_x').value;
 	alert("esiste!");
 
