@@ -40,6 +40,9 @@ jQuery(document).ready(function() {
         var all_boxes = $('#target').children();
         for(var i = 0;i<all_boxes.length; i++) {
             alert(all_boxes[i].id);
+
+            //es: sensorGUI_1 split result --> sensorGUI  and  1
+
             var child = $("#"+all_boxes[i].id).children();
             for(var j = 0;j<child.length; j++){
                 if(child[j].id == "sensor_select"){

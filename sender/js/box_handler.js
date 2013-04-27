@@ -12,7 +12,6 @@ BoxHandler.prototype.findAllServices = function(){
 				console.log("Service "+service.serviceAddress+" found ("+service.api+")");
 				if(service.api.indexOf("sensors.") !== -1){
 					services[service.id] = service;
-					//$("#sensor_select_x").append("<option value='"+service.id+"'>"+service.description+"</option>");
 				}
 			}
 	});
@@ -58,7 +57,10 @@ var addDragEventsForTarget = function(){
 				GUISensorBox();
 				break;
 			case "operation":
-				alert("operation");
+				GUIOperationBox();
+				break;
+			case "userInput":
+				GUIUserInputBox();
 				break;
 			default:
 				alert("Error");
@@ -76,6 +78,26 @@ BoxHandler.prototype.setInitBoxes = function(){
 	
 }
 
+/*****************     OPERATION   ******************/
+
+var GUIOperationBox = function(){
+	//inctement num_boxes add on target
+	this.num_boxes++;
+
+	var html = "";
+	html += "<div id='operationGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #0000ff; border-radius: 5px; margin:5px 5px 0px 5px;'>";
+	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+	html += "Operation: <select id='sensor_select'>";
+	html += "<option value='sum'> + </option>";
+    html += "<option value='subtraction'> - </option>";
+    html += "<option value='multiplication'> * </option>";
+    html += "<option value='division'> / </option>";
+	html += "</select>";
+	html += "</div>";
+
+	$("#target").append(html);
+
+}
 
 
 BoxHandler.prototype.make_operation = function(parameter_1, parameter_2, operation){
@@ -93,19 +115,20 @@ BoxHandler.prototype.make_operation = function(parameter_1, parameter_2, operati
     }
 }
 
+/*****************     SENSOR   ******************/
 
 var GUISensorBox = function(){
 
-	//inctement num_boxes add on target
+	//increment num_boxes add on target
 	this.num_boxes++;
 
 	var html = "";
 	html += "<div id='sensorGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
-    html += "Timeout: <input type='text' id='timeout_sensor' />";
-    html += "Rate: <input type='text' id='rate_sensor' />";
-    html += "Interval: <input type='text' id='interval_sensor' />";
-    html += "Sensors: <select id='sensor_select'></select>";
-    html += "<div id='sensor_value'></div>";
+	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+    html += "Timeout: <input type='text' id='timeout_sensor' value='120' style='width:40px;' /> ";
+    html += "Rate: <input type='text' id='rate_sensor' value='500' style='width:40px;' /> ";
+    html += "Interval: <input type='text' id='interval_sensor' value='fixedinterval' /> ";
+    html += "Sensors: <select id='sensor_select'></select> ";
     html += "</div>";
 
     $("#target").append(html);
@@ -125,7 +148,27 @@ var GUISensorBox = function(){
 }
 
 BoxHandler.prototype.sensorBoxHandler = function(){
-	var idSensor_selected = document.getElementById('sensor_select_x').value;
+	//var idSensor_selected = document.getElementById('sensor_select_x').value;
+	alert("esiste!");
 
-		
+	//operazione: funzione che prende in ingresso due valori, fa l'operazione e resituisce il risultato
+	//sensore: funzione che fa il bind del sensore selezionato dall'utente e l'event handler restituisce il valore letto
+	//input user: funzione che legge l'input immesso dall'utente e lo restituisce
+}
+
+/*****************     USER INPUT VALUE    ******************/
+
+var GUIUserInputBox = function(){
+
+	//increment num_boxes add on target
+	this.num_boxes++;
+
+	var html = "";
+	html += "<div id='sensorGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
+	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+    html += "Input value: <input type='text' id='input_val' /> ";
+    html += "</div>";
+
+    $("#target").append(html);
+
 }
