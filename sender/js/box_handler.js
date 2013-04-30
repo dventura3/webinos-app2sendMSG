@@ -150,7 +150,7 @@ var GUIUserInputBox = function(){
 	this.num_boxes++;
 
 	var html = "";
-	html += "<div id='sensorGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
+	html += "<div id='userInputGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
 	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
     html += "Input value: <input type='text' id='input_val' /> ";
     html += "</div>";
