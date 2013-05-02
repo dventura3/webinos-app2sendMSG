@@ -1,6 +1,7 @@
 ;(function() {
 
    var _initialised = false,
+        /*
         showConnectionInfo = function(s) {
             $("#list").html(s);
             $("#list").fadeIn({complete:function() { jsPlumb.repaintEverything(); }});
@@ -8,6 +9,7 @@
         hideConnectionInfo = function() {
             $("#list").fadeOut({complete:function() { jsPlumb.repaintEverything(); }});
         },
+        */
         connections = [],
         updateConnections = function(conn, remove) {
             if (!remove) connections.push(conn);
@@ -20,6 +22,7 @@
                 }
                 if (idx != -1) connections.splice(idx, 1);
             }
+            /*
             if (connections.length > 0) {
                 var s = "<span><strong>Connections</strong></span><br/><br/><table><tr><th>Scope</th><th>Source</th><th>Target</th></tr>";
                 for (var j = 0; j < connections.length; j++) {
@@ -28,6 +31,7 @@
                 showConnectionInfo(s);
             } else 
                 hideConnectionInfo();
+            */
         };
     
     window.jsPlumbDemo = {

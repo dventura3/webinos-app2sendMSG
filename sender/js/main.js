@@ -1,10 +1,12 @@
 //sender
+// http://jsfiddle.net/rishabhsagar/PsytV/36/
 
 var app2app;
 var clientChannelProxy;
 var boxes;
 var sHandler;
 var services = {};
+
 
 jQuery(document).ready(function() {
 
@@ -64,33 +66,9 @@ jQuery(document).ready(function() {
         }
     });
 
-    $('#btnRemoveEventListener').click(function() {
-        var all_boxes = $('#target').children();
-        for(var i = 0;i<all_boxes.length; i++) {
-            alert(all_boxes[i].id);
-
-            //es: sensorGUI_1 split result --> sensorGUI  and  1
-            var box_type = all_boxes[i].id.split("_")[0];
-
-            if(box_type == "sensorGUI"){
-                var child = $("#"+all_boxes[i].id).children();
-                for(var j = 0;j<child.length; j++){
-                    if(child[j].id == "sensor_select"){
-                        //var sid = sem.deserialize(child[j].value);
-                        var service = services[child[j].value];
-                        //alert(child[j].value);
-                        alert(JSON.stringify(service));
-
-                        service.removeEventListener('sensor', onSensorEvent, false);
-                        
-                    }
-                }
-            }
-            
-        }
-    });
-
 });
+
+
 
 function searchMyChannel(channelNamespace){
 	if (typeof clientChannelProxy !== "undefined") {

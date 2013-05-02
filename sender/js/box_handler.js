@@ -46,6 +46,11 @@ var addDragEventsForTarget = function(){
 
 	target.ondrop = function(event){
 
+		var coord = {
+			x:window.event.clientX,
+			y:window.event.clientY
+		}
+
 		//remove class "valid"
 		this.className = "";
 
@@ -53,13 +58,13 @@ var addDragEventsForTarget = function(){
 
 		switch(box_selected){
 			case "sensor":
-				GUISensorBox();
+				GUISensorBox(coord);
 				break;
 			case "operation":
-				GUIOperationBox();
+				GUIOperationBox(coord);
 				break;
 			case "userInput":
-				GUIUserInputBox();
+				GUIUserInputBox(coord);
 				break;
 			default:
 				alert("Error");
@@ -77,15 +82,18 @@ BoxHandler.prototype.setInitBoxes = function(){
 	
 }
 
+
+
+
 /*****************     OPERATION   ******************/
 
-var GUIOperationBox = function(){
+var GUIOperationBox = function(coord){
 	//inctement num_boxes add on target
 	this.num_boxes++;
 
 	var html = "";
 	html += "<div id='operationGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #0000ff; border-radius: 5px; margin:5px 5px 0px 5px;'>";
-	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+	//html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
 	html += "Operation: <select id='sensor_select'>";
 	html += "<option value='sum'> + </option>";
     html += "<option value='subtraction'> - </option>";
@@ -103,14 +111,14 @@ var GUIOperationBox = function(){
 
 /*****************     SENSOR   ******************/
 
-var GUISensorBox = function(){
+var GUISensorBox = function(coord){
 
 	//increment num_boxes add on target
 	this.num_boxes++;
 
 	var html = "";
 	html += "<div id='sensorGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
-	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+	//html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
     html += "Timeout: <input type='text' id='timeout_sensor' value='120' style='width:40px;' /> ";
     html += "Rate: <input type='text' id='rate_sensor' value='500' style='width:40px;' /> ";
     html += "Interval: <input type='text' id='interval_sensor' value='fixedinterval' /> ";
@@ -144,14 +152,14 @@ BoxHandler.prototype.sensorBoxHandler = function(sid){
 
 /*****************     USER INPUT VALUE    ******************/
 
-var GUIUserInputBox = function(){
+var GUIUserInputBox = function(coord){
 
 	//increment num_boxes add on target
 	this.num_boxes++;
 
 	var html = "";
 	html += "<div id='userInputGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #ff0000; border-radius: 5px; margin:5px 5px 0px 5px;'>";
-	html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
+	//html += "Level: <input type='number' id='level' value='1' style='width:40px;' /> ";
     html += "Input value: <input type='text' id='input_val' /> ";
     html += "</div>";
 

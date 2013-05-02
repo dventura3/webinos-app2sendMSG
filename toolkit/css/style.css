@@ -1,0 +1,10 @@
+.box {
+	height:70px;
+	float:left; 
+	border: 1px solid #ff0000; 
+	margin: 0px 0px 20px 20px; 
+	clear:both;
+}
+
+#target { width:750px; height:500px;}
+.valid {  background: yellow;}
