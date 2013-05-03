@@ -62,6 +62,7 @@ function createChannel(urn){
    			// connect to the channel the requestCallback is invoked which should return true (if allowed to connect) or false.
    			// If no requestCallback is defined all connect requests are granted.
             function(request) {
+                alert(JSON.stringify(request));
                 // we allow all clients to connect (we could also for example check some application-
                 // specific information in the request.requestInfo to make a decision)
                 return confirm("[CREATOR] Do you allow the client to connect?");

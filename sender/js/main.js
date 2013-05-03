@@ -35,7 +35,7 @@ jQuery(document).ready(function() {
 	});
 
 
-
+/*
     boxes = new BoxHandler();
     sHandler = new ServiceHandler();
 
@@ -65,6 +65,8 @@ jQuery(document).ready(function() {
             
         }
     });
+
+*/
 
 });
 
@@ -130,6 +132,7 @@ function connectToChannel(channelProxy){
         },
         // callback invoked when the client is successfully connected (i.e. authorized by the creator)
         function(success) {
+            alert(JSON.stringify(success));
             // make the proxy available now that we are successfully connected
             clientChannelProxy = channelProxy;
             console.log("[CLIENT] Channel Created qith success");
