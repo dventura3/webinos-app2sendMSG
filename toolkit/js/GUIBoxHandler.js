@@ -2,6 +2,7 @@ function GUIBoxHandler() {
    	var num_boxes = 0;
    	var services = {};
    	var that = this;
+   	var start_coord = {};
 
    	this.incrementNumBoxes = function(){
 		num_boxes++;
@@ -44,6 +45,18 @@ function GUIBoxHandler() {
 		for(var i = 0;i<boxes.length; i++) {
 			boxes[i].ondragstart = function(event) {
 				event.dataTransfer.setData("box", this.id);
+
+				//salve coord of: start position of box - actual mouse coord
+				var elem = document.getElementById(this.id);
+				var rect = elem.getBoundingClientRect();
+	    		h = rect.left  - event.clientX;
+	    		k = rect.top - event.clientY;
+				
+				start_coord[this.id] = {
+					xcood:h,
+					ycood:k
+				};
+
 			}
 		}
 	}
@@ -63,14 +76,19 @@ function GUIBoxHandler() {
 		}
 
 		target.ondragover = function(event){
+			event.preventDefault();
 			return false;
 		}
 
 		target.ondrop = function(event){
 
+			// -250 because offset on demo-new.css for "leftcol" div
+    		xx = (event.clientX + start_coord[event.dataTransfer.getData("box")].xcood - 250);
+    		yy = (event.clientY + start_coord[event.dataTransfer.getData("box")].ycood);
+
 			var coord = {
-				x:window.event.clientX,
-				y:window.event.clientY
+				x:xx,
+				y:yy
 			}
 
 			//remove class "valid"
@@ -80,16 +98,13 @@ function GUIBoxHandler() {
 
 			switch(box_selected){
 				case "sensor":
-					alert("sensor");
-					//GUISensorBox(coord);
+					that.GUISensorBox(coord);
 					break;
 				case "operation":
-					alert("operation");
-					//that.GUIOperationBox(coord);
+					that.GUIOperationBox(coord);
 					break;
 				case "userInput":
-					alert("userInput");
-					//GUIUserInputBox(coord);
+					that.GUIUserInputBox(coord);
 					break;
 				default:
 					alert("Error");
@@ -102,50 +117,196 @@ function GUIBoxHandler() {
 		findAllServices();
 		addOnDragStart();
 		addDragEventsForTarget();
+		GUIOutputBox();
+	}
+
+/*****************   TO CREATE INPUT/OUTPUT DESIGN   ******************/
+
+	var greeCircle = function(){
+
+		var exampleDropOptions = {
+		    tolerance:"touch",
+		    hoverClass:"dropHover"
+		};
+		var color2 = "#316b31";
+	    var exampleEndpoint2 = {
+	        endpoint:["Dot", { radius:15 }],
+            paintStyle:{ fillStyle:color2 },
+            isSource:false,
+            isTarget:true,
+            scope:"idem",
+            connectorStyle:{ strokeStyle:color2, lineWidth:8 },
+            connector: ["Bezier", { curviness:63 } ],
+            maxConnections:-1, //unlimited
+            beforeDetach:function(conn) { 
+                return confirm("Detach connection?"); 
+            },
+            dropOptions : exampleDropOptions
+	    };
+
+	    return exampleEndpoint2;
+	}
+
+	var blueRectangle = function(){
+
+		var exampleDropOptions = {
+		    tolerance:"touch",
+		    hoverClass:"dropHover"
+		};
+
+		var exampleColor = "#00f";
+	    var exampleEndpoint = {
+	        endpoint:"Rectangle",
+            paintStyle:{ width:25, height:21, fillStyle:exampleColor },
+            isSource:true,
+            isTarget:false,
+            //reattach:true,
+            scope:"idem",
+            connectorStyle : {
+                gradient:{stops:[[0, exampleColor], [0.5, "#09098e"], [1, exampleColor]]},
+                lineWidth:5,
+                strokeStyle:exampleColor,
+                dashstyle:"2 2"
+            },
+            maxConnections:-1, //unlimited            
+            dropOptions : exampleDropOptions
+	    };
+	    return exampleEndpoint;      
 	}
 
 
+/*****************     OUTPUT   ******************/
+
+	var GUIOutputBox = function(){
+		//increment num_boxes add on target
+		num_boxes++;
+
+		idbox = "output_"+num_boxes;
+
+		var html="";
+		html += "<div class='window' id='"+idbox+"'>";
+		html += "Output<br/><br/>";
+		html += "</div>";
+
+		$("#main").append(html);
+
+		var d = document.getElementById(idbox);
+		d.style.left = '330px';
+		d.style.top = '430px';
+		
+		jsPlumb.addEndpoint(idbox, { anchor:"TopCenter" }, greeCircle());
+    	
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
+
+	}
 
 /*****************     OPERATION   ******************/
 
 	this.GUIOperationBox = function(coord){
 		//increment num_boxes add on target
-		this.num_boxes++;
+		num_boxes++;
+
+		idbox = "operationGUI_"+num_boxes;
 
 		var html="";
-		html += "<div class='window' id='myWindow'>";
-		html += "two<br/><br/>";
-		html += "<a href='#' class='cmdLink hide' rel='window2'>toggle connections</a><br/>";
-		html += "</div>";
-/*
-		var html = "";
-		html += "<div id='operationGUI_"+this.num_boxes+"' style='clear:both; border: 1px solid #0000ff; border-radius: 5px; margin:5px 5px 0px 5px;'>";
-		html += "Operation: <select id='sensor_select'>";
+		html += "<div class='window' id='"+idbox+"'>";
+		html += "Operation<br/><br/>";
+		html += "<select id='sensor_select'>";
 		html += "<option value='sum'> + </option>";
 	    html += "<option value='subtraction'> - </option>";
 	    html += "<option value='multiplication'> * </option>";
 	    html += "<option value='division'> / </option>";
 		html += "</select>";
 		html += "</div>";
-*/
-		$("#target").append(html);
 
-		var d = document.getElementById('myWindow');
-		d.style.left = coord.x;
-		d.style.top = coord.y;
+		$("#main").append(html);
+
+		var d = document.getElementById(idbox);
+		d.style.left = coord.x+'px';
+		d.style.top = coord.y+'px';
 		
-		var e2 = jsPlumb.addEndpoint('myWindow', { anchor:"TopCenter" }, greeCircle());
-    	jsPlumb.draggable($(".window"));
+		jsPlumb.addEndpoint(idbox, { anchor:"TopRight" }, greeCircle());
+		jsPlumb.addEndpoint(idbox, { anchor:"TopLeft" }, greeCircle());
+		jsPlumb.addEndpoint(idbox, { anchor:"BottomCenter" }, blueRectangle());
+    	
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
 
 	}
 
 
 /*****************     SENSOR   ******************/
 
+	this.GUISensorBox = function(coord){
+
+		//increment num_boxes add on target
+		num_boxes++;
+
+		idbox = "sensorGUI_"+num_boxes;
+
+		var html = "";
+		html += "<div class='window' id='"+idbox+"' >";
+		html += "Sensor<br/><br/>";
+	    html += "Timeout: <input type='text' id='timeout_sensor' value='120' style='width:40px;' /><br/>";
+	    html += "Rate: <input type='text' id='rate_sensor' value='500' style='width:40px;' /><br/>";
+	    html += "Interval: <input type='text' id='interval_sensor' value='fixedinterval' style='width:70px;' /><br/>";
+	    html += "Sensors: <select id='sensor_select'></select> ";
+	    html += "</div>";
+
+	    $("#main").append(html);
+
+	    //add sensor list on "sensor_select"
+	    var child = $("#"+idbox).children();
+	    for(var i = 0;i<child.length; i++){
+	    	if(child[i].id == "sensor_select"){
+	    		for(var sid in services["sensors"]){
+	    			var optTMP = document.createElement("option");
+	    			optTMP.text = services.sensors[sid].description;
+	    			optTMP.value = sid;
+	    			child[i].options.add(optTMP);
+	    		}
+	    	}
+	    }
+
+	    var d = document.getElementById(idbox);
+		d.style.left = coord.x+'px';
+		d.style.top = coord.y+'px';
+		
+		jsPlumb.addEndpoint(idbox, { anchor:"BottomCenter" }, blueRectangle());
+    	
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
+	}
 
 
 /*****************     USER INPUT VALUE    ******************/
 
+	this.GUIUserInputBox = function(coord){
+
+		//increment num_boxes add on target
+		num_boxes++;
+
+		idbox = "userInputGUI_"+num_boxes;
+
+		var html = "";
+		html += "<div class='window' id='"+idbox+"' >";
+		html += "Input value<br/><br/>";
+	    html += "<input type='text' id='input_val' /> ";
+	    html += "</div>";
+
+	    $("#main").append(html);
+
+	    var d = document.getElementById(idbox);
+		d.style.left = coord.x+'px';
+		d.style.top = coord.y+'px';
+		
+		jsPlumb.addEndpoint(idbox, { anchor:"BottomCenter" }, blueRectangle());
+    	
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
+
+	}
 
 
 };

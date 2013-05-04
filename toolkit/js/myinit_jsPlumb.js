@@ -42,7 +42,7 @@
             jsPlumb.bind("connectionDetached", function(info, originalEvent) {
                 updateConnections(info.connection, true);
             });
-
+/*
 
             // setup some empty endpoints.  again note the use of the three-arg method to reuse all the parameters except the location
             // of the anchor (purely because we want to move the anchor around here; you could set it one time and forget about it though.)
@@ -59,7 +59,7 @@
             // you can bind for a maxConnections callback using a standard bind call, but you can also supply 'onMaxConnections' in an Endpoint definition - see exampleEndpoint3 above.
             e1.bind("maxConnections", maxConnectionsCallback);
 
-
+*/
             // three ways to do this - an id, a list of ids, or a selector (note the two different types of selectors shown here...anything that is valid jquery will work of course)
             var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
             jsPlumb.draggable(divsWithWindowClass);

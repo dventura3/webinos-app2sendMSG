@@ -4,8 +4,8 @@
 #window4 { top:30em; right:25%}
 .window {  
     border:1px dotted gray; 
-    width:9.7em; 
-    height:8em;      
+    min-width:9.7em; 
+    min-height:4em;      
     position:absolute; 
     color:gray;
     font-family:serif;
