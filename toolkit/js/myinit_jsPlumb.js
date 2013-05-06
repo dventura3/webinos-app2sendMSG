@@ -1,4 +1,4 @@
-(function() {
+//(function() {
 
    var _initialised = false,
         connections = [],
@@ -115,6 +115,6 @@
 
 
     
-})();
+//})();
 
 
