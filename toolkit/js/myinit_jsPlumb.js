@@ -14,11 +14,27 @@
                 if (idx != -1) connections.splice(idx, 1);
             }
 
-            alert(connections.length);
             if (connections.length > 0) {
                 for (var j = 0; j < connections.length; j++) {
                     s = "Source: " + connections[j].sourceId + " - Target: " + connections[j].targetId;
+
                     alert(s);
+
+                    /*
+                    Is it possible to set parameters for an endpoints.
+                    The functions available are:
+                    - getParameter(String)
+                    - setParameter(String, Object)
+                    - Object getParameters()
+                    - setParameters(Object)
+                    The behaviour when establishing a connection between two endpoints is to merge the endpoint's parameters in to the connections parameters object
+                    note that here, if they all have some parameter with the same name, the precedence is as follows:
+                    1. connection's value
+                    2. target endpoint's value
+                    3. source endpoint's value
+                    */
+                    var params = connections[j].getParameters();
+                    alert(params.position);
                 }
             }
         };
@@ -37,6 +53,7 @@
 
             // bind to connection/connectionDetached events, and update the list of connections on screen.
             jsPlumb.bind("connection", function(info, originalEvent) {
+                //alert(" *** SourceEndpoint: " + info.sourceEndpoint.id + " - TargetEndpoint: " + info.targetEndpoint.id);
                 updateConnections(info.connection);
             });
             jsPlumb.bind("connectionDetached", function(info, originalEvent) {

@@ -138,7 +138,8 @@ function GUIBoxHandler() {
             connectorStyle:{ strokeStyle:color2, lineWidth:8 },
             connector: ["Bezier", { curviness:63 } ],
             maxConnections:-1, //unlimited
-            beforeDetach:function(conn) { 
+            beforeDetach:function(conn) {
+            	//alert("#beforeDetach *** SourceEndpoint: " + conn.sourceEndpoint + " - TargetEndpoint: " + conn.targetEndpoint);
                 return confirm("Detach connection?"); 
             },
             dropOptions : exampleDropOptions
@@ -194,8 +195,8 @@ function GUIBoxHandler() {
 		d.style.left = '330px';
 		d.style.top = '430px';
 		
-		jsPlumb.addEndpoint(idbox, { anchor:"TopCenter" }, greeCircle());
-    	
+		var endpoint = jsPlumb.addEndpoint(idbox, { anchor:"TopCenter" }, greeCircle());
+
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
         jsPlumb.draggable(divsWithWindowClass);
 
@@ -226,8 +227,18 @@ function GUIBoxHandler() {
 		d.style.left = coord.x+'px';
 		d.style.top = coord.y+'px';
 		
-		jsPlumb.addEndpoint(idbox, { anchor:"TopRight" }, greeCircle());
-		jsPlumb.addEndpoint(idbox, { anchor:"TopLeft" }, greeCircle());
+		jsPlumb.addEndpoint(idbox, { 
+			anchor:"TopRight",
+			parameters:{
+				position:"right"
+			} 
+		}, greeCircle());
+		jsPlumb.addEndpoint(idbox, { 
+			anchor:"TopLeft",
+			parameters:{
+				position:"left"
+			} 
+		}, greeCircle());
 		jsPlumb.addEndpoint(idbox, { anchor:"BottomCenter" }, blueRectangle());
     	
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
