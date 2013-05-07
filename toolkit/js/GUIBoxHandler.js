@@ -179,10 +179,8 @@ function GUIBoxHandler() {
 /*****************     OUTPUT   ******************/
 
 	var GUIOutputBox = function(){
-		//increment num_boxes add on target
-		num_boxes++;
 
-		idbox = "output_"+num_boxes;
+		idbox = "output_0";
 
 		var html="";
 		html += "<div class='window' id='"+idbox+"'>";
@@ -288,6 +286,23 @@ function GUIBoxHandler() {
     	
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
         jsPlumb.draggable(divsWithWindowClass);
+	}
+
+	this.getSensorConfig = function(id){
+		var config = {};
+		var child = $("#"+id).children();
+        for(var j = 0;j<child.length; j++){
+        	if(child[j].id == "timeout_sensor"){
+        		config.timeout_sensor = child[j].value;
+        	}else if(child[j].id == "rate_sensor"){
+        		config.rate_sensor = child[j].value;             
+            }else if(child[j].id == "interval_sensor"){
+        		config.interval_sensor = child[j].value;             
+            }else if(child[j].id == "sensor_select"){
+        		config.sensor = services["sensors"][child[j].value];             
+            }
+        }
+        return config;
 	}
 
 

@@ -2,6 +2,111 @@ function ServiceHandler() {
    	this.myboxes = {};
     this.num = 0;
     var listSensorValue = {};
+    var tree = {}; //tree is used to know connections from box node.
+    var levels = {}; //id = number of levels - value: list of boxID in there level - used to know function order to invoke
+
+
+    this.getTree = function(){
+        return tree;
+    }
+
+    this.getLevels = function(){
+        return levels;
+    }
+
+    this.setLevels = function(id, list){
+        levels[id] = list;
+    }
+
+
+/*****************     HANDLER TREE   ******************/
+
+    var fillinTree = function(){
+        //remove all elements from tree
+        tree = {};
+        //add elements in tree in base of connections
+        if (connections.length > 0) {
+            for (var j = 0; j < connections.length; j++) {
+                if(!tree.hasOwnProperty(connections[j].targetId)){
+                    tree[connections[j].targetId] = [];
+                }
+                tree[connections[j].targetId].push(connections[j].sourceId);
+            }
+        }
+    }
+
+    var removeLeaves = function(treeModified){
+        var treeTMP = {};
+        var max_level = Object.keys(levels).length - 1;
+
+        for(var targetId in treeModified){
+            list_sourceID = treeModified[targetId];
+            newList = [];
+            for(var j=0; j<list_sourceID.length; j++){
+                var to_remove = false;
+                if(typeof levels[max_level] !== "undefined"){
+                    for(var h=0; h<levels[max_level].length; h++){
+                        if(list_sourceID[j] == levels[max_level][h])
+                            to_remove = true;
+                    }
+                }
+                if(to_remove==false){
+                    newList.push(list_sourceID[j]);
+                }
+            }
+
+            if(newList.length!=0 || targetId=="output_0" ){
+                treeTMP[targetId] = newList;
+            }
+        }
+        
+        return treeTMP;
+    }
+
+    var getLeaves = function(nodeID, num_level, treeTMP){
+        var leaves = [];
+        if(typeof treeTMP[nodeID] === "undefined"){
+            //nodeID is a leave because not exist
+            leaves.push(nodeID);
+        }else{
+            for(var h=0; h<treeTMP[nodeID].length; h++){
+                kk = getLeaves(treeTMP[nodeID][h], num_level, treeTMP);
+                if(kk.length!=0){
+                    leaves = leaves.concat(kk);
+                }
+            }
+        }
+        return leaves;
+    }
+
+
+    this.createTree = function(){
+
+        fillinTree();
+
+        var num_levels = 0;
+        var treeTMP = tree;
+        do{
+            treeTMP = removeLeaves(treeTMP);
+            myleaves = getLeaves("output_0",num_levels,treeTMP);
+            this.setLevels(num_levels, myleaves);
+            num_levels++;
+        }while(myleaves.length!=0);
+
+        //alert(JSON.stringify(levels));
+    }
+
+
+/*****************     COMBINED SERVICE   ******************/
+
+
+    this.createCombinedService = function(serviceName){
+
+        var functionContent = "";
+
+        alert("numero di livelli" + Object.keys(levels).length);
+
+    }
 
 
 /*****************     OPERATION   ******************/

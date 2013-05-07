@@ -17,8 +17,7 @@
             if (connections.length > 0) {
                 for (var j = 0; j < connections.length; j++) {
                     s = "Source: " + connections[j].sourceId + " - Target: " + connections[j].targetId;
-
-                    alert(s);
+                    //alert(s);
 
                     /*
                     Is it possible to set parameters for an endpoints.
@@ -34,7 +33,7 @@
                     3. source endpoint's value
                     */
                     var params = connections[j].getParameters();
-                    alert(params.position);
+                    //alert(params.position);
                 }
             }
         };
