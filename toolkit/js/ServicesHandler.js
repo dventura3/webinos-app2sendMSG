@@ -2,6 +2,8 @@ function ServiceHandler() {
    	this.myboxes = {};
     this.num = 0;
     var listSensorValue = {};
+
+    var servicesDescription = {};
     var tree = {}; //tree is used to know connections from box node.
     var levels = {}; //id = number of levels - value: list of boxID in there level - used to know function order to invoke
 
@@ -16,6 +18,32 @@ function ServiceHandler() {
 
     this.setLevels = function(id, list){
         levels[id] = list;
+    }
+
+    this.init = function(){
+        servicesDescription.sensor = {
+            function_name:"getSensorValue",
+            inputBoxes:0,
+            outputBoxes:1,
+            inputArgs:["timeout","rate","interval","sensor"],
+            outputArgs:["sensorValues"]
+        };
+
+        servicesDescription.operation = {
+            function_name:"executeOperation",
+            inputBoxes:2,
+            outputBoxes:1,
+            inputArgs:["parameter_1", "parameter_2", "operation"],
+            outputArgs:["resultOperation"]
+        };
+
+        servicesDescription.userInput = {
+            function_name:null,
+            inputBoxes:0,
+            outputBoxes:1,
+            inputArgs:[],
+            outputArgs:[]
+        };
     }
 
 
@@ -100,11 +128,45 @@ function ServiceHandler() {
 /*****************     COMBINED SERVICE   ******************/
 
 
-    this.createCombinedService = function(serviceName){
+    this.createCombinedService = function(serviceName, configList){
+
+        var variableReturned = {};
 
         var functionContent = "";
+        var variableNumber = 0;
+        var max_level = Object.keys(levels).length - 1;
 
-        alert("numero di livelli" + Object.keys(levels).length);
+        for(var level in levels){
+            for(var i=0; i<levels[level].length; i++){
+                var boxType = levels[level][i].split("_")[0];
+
+                switch(boxType){
+                    case "operationGUI":
+                        //if(servicesDescription.operation.inputBoxes==;
+                        break;
+                    case "sensorGUI":
+                        //servicesDescription.sensor;
+                        break;
+                    case "userInputGUI":
+                        //servicesDescription.userInput;
+                        break;
+                    default:
+                        break;
+                }
+
+                /*
+                if(level==0){
+                    //input of service
+
+                }else if(level<max_level && level>0){
+                    //inner function of service
+
+                }else if(level==max_level){
+                    //output of service
+                }
+                */
+            }
+        }
 
     }
 

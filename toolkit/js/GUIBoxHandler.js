@@ -211,7 +211,7 @@ function GUIBoxHandler() {
 		var html="";
 		html += "<div class='window' id='"+idbox+"'>";
 		html += "Operation<br/><br/>";
-		html += "<select id='sensor_select'>";
+		html += "<select id='operation_select'>";
 		html += "<option value='sum'> + </option>";
 	    html += "<option value='subtraction'> - </option>";
 	    html += "<option value='multiplication'> * </option>";
@@ -242,6 +242,17 @@ function GUIBoxHandler() {
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
         jsPlumb.draggable(divsWithWindowClass);
 
+	}
+
+	this.getOperationConfig = function(id){
+		var config = {};
+		var child = $("#"+id).children();
+        for(var j = 0;j<child.length; j++){
+			if(child[j].id == "operation_select"){
+        		config.operation = child[j].value;             
+            }
+        }
+        return config;
 	}
 
 
@@ -288,6 +299,7 @@ function GUIBoxHandler() {
         jsPlumb.draggable(divsWithWindowClass);
 	}
 
+
 	this.getSensorConfig = function(id){
 		var config = {};
 		var child = $("#"+id).children();
@@ -331,9 +343,18 @@ function GUIBoxHandler() {
     	
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
         jsPlumb.draggable(divsWithWindowClass);
-
 	}
 
+	this.getUIConfig = function(id){
+		var config = {};
+		var child = $("#"+id).children();
+        for(var j = 0;j<child.length; j++){
+			if(child[j].id == "input_val"){
+        		config.ui = child[j].value;             
+            }
+        }
+        return config;
+	}
 
 };
 
