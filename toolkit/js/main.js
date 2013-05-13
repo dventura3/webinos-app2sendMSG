@@ -69,7 +69,8 @@ jsPlumb.bind("ready", function() {
 	$('#btnStartService').click(function() {
 		for(var x=0; x<servicesName.length; x++){
 			var str = "sh." + servicesName[x] + "()";
-			eval(str);
+			var result = eval(str);
+			alert("result: "+ JSON.stringify(result));
 		}
 	});
 

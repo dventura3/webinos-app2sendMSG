@@ -273,16 +273,18 @@ function ServiceHandler() {
 
         */
 
-        objReturned = {};
+        objReturned = "" ;
         //create Output of service
         for(var f=0; f<variableReturned[(max_level-1)].length;f++){
             if(variableReturned[(max_level-1)][f].target=="output_0"){
-                objReturned[variableReturned[(max_level-1)][f].source] = variableReturned[(max_level-1)][f].name;
+                objReturned += "'" + variableReturned[(max_level-1)][f].source + "':" +variableReturned[(max_level-1)][f].name +",";
             }
         }
 
-        objReturned = 77777;
-        //alert("RETURN: " + JSON.stringify(objReturned));
+        objReturned = objReturned.substr(0, objReturned.length-1);
+        objReturned = "{" + objReturned + "}";
+
+        alert("RETURN: " + JSON.stringify(objReturned));
 
         /*
 
@@ -292,7 +294,7 @@ function ServiceHandler() {
         */
 
         //var serviceFunction = "function " + serviceName + "("+functionArguments+"){"+ functionContent +" return "+ objReturned +";}";
-        var serviceFunction = "ServiceHandler.prototype."+ serviceName + " = function("+functionArguments+"){ "+ functionContent +" }";
+        var serviceFunction = "ServiceHandler.prototype."+ serviceName + " = function("+functionArguments+"){ "+ functionContent +" return "+ objReturned +"; }";
         eval(serviceFunction);
 
         //var func = "function "+ serviceName + " (){ alert('DENTRO FUNZIONE NUOVA!');} ";
