@@ -133,47 +133,204 @@ function ServiceHandler() {
         var variableReturned = {};
 
         var functionContent = "";
+        var functionArguments = "";
+
         var variableNumber = 0;
         var max_level = Object.keys(levels).length - 1;
 
         for(var level in levels){
             for(var i=0; i<levels[level].length; i++){
+
+                var boxID = levels[level][i];
+
                 var boxType = levels[level][i].split("_")[0];
 
                 switch(boxType){
+                    case "input":
+                        if(!variableReturned.hasOwnProperty(level)){
+                            variableReturned[level] = [];
+                        }
+                        //devo creare tante variabili/argomenti quanti sono le connessioni tra inputBOX - altriBOX
+                        if (connections.length > 0) {
+                            for (var j=0; j<connections.length; j++) {
+                                //variableReturned["0"] = arguments of service function
+                                if(connections[j].sourceId==boxID){
+                                    functionArguments = "variable" + variableNumber + ",";
+                                    variableReturned[level].push({
+                                                                name: "variable" + variableNumber,
+                                                                source:connections[j].sourceId,
+                                                                target:connections[j].targetId
+                                                            });
+                                    variableNumber++;
+                                }
+                            }
+                        }
+                        break;
                     case "operationGUI":
-                        //if(servicesDescription.operation.inputBoxes==;
+                        if(!variableReturned.hasOwnProperty(level)){
+                            variableReturned[level] = [];
+                        }
+                        //verify that connection are ok --> what are variable of superior level to input of operation?
+                        //pass all to function
+                        //return value to save in variableReturned
+                        if(servicesDescription.operation.inputBoxes==tree[boxID].length){
+                            var left = "";
+                            var right = "";
+                            //i create variables and obtain variable left and right
+                            if (connections.length > 0) {
+                                for (var j=0; j<connections.length; j++) {
+                                    //se il box è source di un altro box, creo la variabile
+                                    if(connections[j].sourceId==boxID){
+                                        variableReturned[level].push({ 
+                                                                    name: "variable" + variableNumber,
+                                                                    source:connections[j].sourceId,
+                                                                    target:connections[j].targetId
+                                                                });
+                                    }
+                                    //se il box è target di altro box di livello superiore, devo prendere la variabile del livello superiore
+                                    if(connections[j].targetId==boxID){
+                                        var params = connections[j].getParameters();
+                                        for(var f=0; f<variableReturned[(level-1)].length;f++){
+                                            if(variableReturned[(level-1)][f].source==connections[j].sourceId){
+                                                if(params.position=="left")
+                                                    left = variableReturned[(level-1)][f].name;
+                                                else
+                                                    right = variableReturned[(level-1)][f].name;
+
+                                                if(variableReturned[(level-1)][f].target==null){
+                                                    variableReturned[(level-1)][f].target = boxID;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            functionContent += "variable" + variableNumber + " = executeOperation("+left+","+right+",'"+configList[boxID].operation+"');";
+                            variableNumber++;                         
+
+                        }else{
+                            return -1;
+                        }
                         break;
                     case "sensorGUI":
-                        //servicesDescription.sensor;
+                        //SENSOR is a box only in output, it don't have inputs
+                        if(servicesDescription.sensor.inputArgs.length==Object.keys(configList[boxID]).length){
+                            if(!variableReturned.hasOwnProperty(level)){
+                                variableReturned[level] = [];
+                            }
+
+                            //start
+                            getSensorValue(configList[boxID].time,configList[boxID].rates,configList[boxID].interval,configList[boxID].sensor);
+
+                            functionContent += "variable" + variableNumber + " = getSensorValue("+configList[boxID].time+","+configList[boxID].rates+",'"+configList[boxID].interval+"','"+configList[boxID].sensor+"');";
+
+                            variableReturned[level].push({
+                                                        name: "variable" + variableNumber,
+                                                        source:boxID,
+                                                        target:null
+                                                    });
+                            variableNumber++;
+
+                        }else{
+                            return -1;
+                        }
                         break;
                     case "userInputGUI":
-                        //servicesDescription.userInput;
+                        if(Object.keys(configList[boxID]).length==1 && configList[boxID]!=[]){
+                            if(!variableReturned.hasOwnProperty(level)){
+                                variableReturned[level] = [];
+                            }
+
+                            functionContent += "variable" + variableNumber + " = "+configList[boxID].ui +";";
+
+                            variableReturned[level].push({ 
+                                                            name: "variable" + variableNumber,
+                                                            source:boxID,
+                                                            target:null
+                                                        });
+                            variableNumber++;
+
+                        }else{
+                            return -1;
+                        }
                         break;
                     default:
                         break;
                 }
-
-                /*
-                if(level==0){
-                    //input of service
-
-                }else if(level<max_level && level>0){
-                    //inner function of service
-
-                }else if(level==max_level){
-                    //output of service
-                }
-                */
             }
         }
 
+        functionArguments = functionArguments.substr(0, functionArguments.length-1);
+        //alert("functionArguments: " + functionArguments);
+        //alert("functionContent: " + functionContent);
+
+
+        /*
+
+            TODO:
+            Problema dell'objReturned --> chiave/valore avrà come valore la stringa "variablex" e non il valore della variabile!
+
+        */
+
+        objReturned = {};
+        //create Output of service
+        for(var f=0; f<variableReturned[(max_level-1)].length;f++){
+            if(variableReturned[(max_level-1)][f].target=="output_0"){
+                objReturned[variableReturned[(max_level-1)][f].source] = variableReturned[(max_level-1)][f].name;
+            }
+        }
+
+        objReturned = 77777;
+        //alert("RETURN: " + JSON.stringify(objReturned));
+
+        /*
+
+            TODO:
+            Combine and create string content service function.
+
+        */
+
+        //var serviceFunction = "function " + serviceName + "("+functionArguments+"){"+ functionContent +" return "+ objReturned +";}";
+        var serviceFunction = "ServiceHandler.prototype."+ serviceName + " = function("+functionArguments+"){ "+ functionContent +" }";
+        eval(serviceFunction);
+
+        //var func = "function "+ serviceName + " (){ alert('DENTRO FUNZIONE NUOVA!');} ";
+        //this.registerFunction(serviceFunction);
+
+        //window[serviceName]();
+        //eval(serviceInvoked);
+
+
+        return 0;
     }
 
 
+    this.registerFunction = function(functionBody) {
+        "use strict";
+        var script = document.createElement("script");
+       /* script.innerHTML = "function " + functionBody;
+        document.body.appendChild(script);
+        */
+
+        script.innerHTML = functionBody;
+        document.body.appendChild(script);
+    }
+
+/*
+    this.modifyFunction = function(functionName,functionBody){
+        var old_someFunction = functionName;
+
+        var func = "var " + functionName + " = function(){ "++" alert('DENTRO FUNZIONE INIZIALE!');} ";
+        this.registerFunction(func);
+
+
+    }
+*/
+
 /*****************     OPERATION   ******************/
 
-    this.executeOperation = function(parameter_1, parameter_2, operation){
+    var executeOperation = function(parameter_1, parameter_2, operation){
         switch (operation){
             case "sum":
                 return parseInt(parameter_1) + parseInt(parameter_2);
@@ -192,27 +349,21 @@ function ServiceHandler() {
 /*****************     SENSOR   ******************/
 
     var onSensorEvent = function(event){
-        var sensor = services && services[event.sensorId];
-        if (sensor) {
-            if (!sensor.values) {
-                sensor.values = [];
-            }
-            console.log(event);
-            console.log("[VALUE]" + event.sensorValues[0]);
 
-            var item = {
-                sid: event.sensorId,
-                value: event.sensorValues[0] || 0,
-                timestamp: event.timestamp,
-                unit: event.unit
-            };
+        console.log("[VALUE]" + event.sensorValues[0]);
 
-            try{
-                listSensorValue[event.sensorId] = {};
-                listSensorValue[event.sensorId] = item;
-            }catch(err){
-                console.log("[Event Sensor Value is undefined]: " + err.message);
-            }
+        var item = {
+            sid: event.sensorId,
+            value: event.sensorValues[0] || 0,
+            timestamp: event.timestamp,
+            unit: event.unit
+        };
+
+        try{
+            listSensorValue[event.sensorId] = {};
+            listSensorValue[event.sensorId] = item;
+        }catch(err){
+            console.log("[Event Sensor Value is undefined]: " + err.message);
         }
 
     }
@@ -235,16 +386,22 @@ function ServiceHandler() {
     }
 
 
-    this.getSensorValue = function(time, rates, interval, sensor){
-        if(typeof(listSensorValue[sensor.id])!=="undefined"){
+    var getSensorValue = function(time, rates, interval, ids){
+
+        sensor = services.sensors[ids];
+        alert(JSON.stringify(sensor));
+        if(typeof(listSensorValue[ids])!=="undefined"){
             //var service = services[sensor.id];
-            alert("VALUE: " + listSensorValue[sensor.id].value);
-            sensor.removeEventListener('sensor', onSensorEvent, false);
+            alert("VALUE: " + listSensorValue[ids].value);
+            //sensor.removeEventListener('sensor', onSensorEvent, false);
+            return listSensorValue[ids].value;
         }else{
             addEventListenerForSensor(time, rates, interval, sensor);
             //recursive
-            setTimeout(function(){this.getSensorValue(120,500,"fixedinterval",sensor)},1000);
+            //setTimeout(function(){getSensorValue(120,500,"fixedinterval",sensor)},2000);
         }
+
+        return 0;
     }
 
 

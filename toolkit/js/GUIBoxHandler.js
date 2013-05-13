@@ -13,6 +13,10 @@ function GUIBoxHandler() {
 	}
 
 	this.getService = function(type,id){
+
+		if(type=="*")
+			return services;
+
 		var service_type = services[type];
 		for(var i in service_type){
 			if(id==i)
@@ -20,6 +24,7 @@ function GUIBoxHandler() {
 		}
 		return {};
 	}
+
 
 /*****************     INITIALIZATION   ******************/
 
@@ -97,6 +102,9 @@ function GUIBoxHandler() {
 			var box_selected = event.dataTransfer.getData("box").split("box_")[1];
 
 			switch(box_selected){
+				case "input":
+					that.GUIInputBox(coord);
+					break;
 				case "sensor":
 					that.GUISensorBox(coord);
 					break;
@@ -184,7 +192,7 @@ function GUIBoxHandler() {
 
 		var html="";
 		html += "<div class='window' id='"+idbox+"'>";
-		html += "Output<br/><br/>";
+		html += "Output Service<br/><br/>";
 		html += "</div>";
 
 		$("#main").append(html);
@@ -194,6 +202,32 @@ function GUIBoxHandler() {
 		d.style.top = '430px';
 		
 		var endpoint = jsPlumb.addEndpoint(idbox, { anchor:"TopCenter" }, greeCircle());
+
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
+
+	}
+
+/*****************     INPUT   ******************/
+
+	this.GUIInputBox = function(coord){
+		//increment num_boxes add on target
+		num_boxes++;
+
+		idbox = "input_"+num_boxes;
+
+		var html="";
+		html += "<div class='window' id='"+idbox+"'>";
+		html += "Input<br/><br/>";
+		html += "</div>";
+
+		$("#main").append(html);
+
+		var d = document.getElementById(idbox);
+		d.style.left = coord.x+'px';
+		d.style.top = coord.y+'px';
+		
+		jsPlumb.addEndpoint(idbox, { anchor:"BottomCenter" }, blueRectangle());
 
     	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
         jsPlumb.draggable(divsWithWindowClass);
@@ -305,13 +339,14 @@ function GUIBoxHandler() {
 		var child = $("#"+id).children();
         for(var j = 0;j<child.length; j++){
         	if(child[j].id == "timeout_sensor"){
-        		config.timeout_sensor = child[j].value;
+        		config.time = child[j].value;
         	}else if(child[j].id == "rate_sensor"){
-        		config.rate_sensor = child[j].value;             
+        		config.rates = child[j].value;             
             }else if(child[j].id == "interval_sensor"){
-        		config.interval_sensor = child[j].value;             
+        		config.interval = child[j].value;             
             }else if(child[j].id == "sensor_select"){
-        		config.sensor = services["sensors"][child[j].value];             
+        		//config.sensor = services["sensors"][child[j].value];
+        		config.sensor = child[j].value;               
             }
         }
         return config;

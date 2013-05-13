@@ -1,3 +1,7 @@
+var services = {};
+
+var servicesName = [];
+
 jsPlumb.bind("ready", function() {
 	jsPlumb.reset();
 	jsPlumb.setRenderMode(jsPlumb.SVG);
@@ -14,6 +18,8 @@ jsPlumb.bind("ready", function() {
 		if(serviceName){
 			sh.createTree();
 
+			services = gui.getService("*");
+		
 			var configList = {};
 			levels = sh.getLevels();
 			for(var level in levels){
@@ -38,9 +44,11 @@ jsPlumb.bind("ready", function() {
 			}
 
 			sh.createCombinedService(serviceName, configList);
-			
 
-/*
+
+			servicesName.push(serviceName);
+
+			/*
 			var func = serviceName + " (){ alert('DENTRO FUNZIONE NUOVA!');} ";
 			registerFunction(func);
 
@@ -56,6 +64,15 @@ jsPlumb.bind("ready", function() {
 
 		}
 	});
+
+
+	$('#btnStartService').click(function() {
+		for(var x=0; x<servicesName.length; x++){
+			var str = "sh." + servicesName[x] + "()";
+			eval(str);
+		}
+	});
+
 });
 
 function registerFunction(functionBody) {
