@@ -39,6 +39,11 @@ function GUIBoxHandler() {
 							services.sensors = {};
 						}
 						services.sensors[service.id] = service;
+					}else if(service.api.indexOf("actuators.") !== -1){
+						if(!services.hasOwnProperty("actuators")){
+							services.actuators = {};
+						}
+						services.actuators[service.id] = service;
 					}
 				}
 		});
@@ -113,6 +118,9 @@ function GUIBoxHandler() {
 					break;
 				case "userInput":
 					that.GUIUserInputBox(coord);
+					break;
+				case "actuator":
+					that.GUIActuatorBox(coord);
 					break;
 				default:
 					alert("Error");
@@ -353,6 +361,59 @@ function GUIBoxHandler() {
 	}
 
 
+/*****************     ACTUATOR   ******************/
+
+	this.GUIActuatorBox = function(coord){
+
+		//increment num_boxes add on target
+		num_boxes++;
+
+		idbox = "actuatorGUI_"+num_boxes;
+
+		var html = "";
+		html += "<div class='window' id='"+idbox+"' >";
+		html += "Actuator<br/><br/>";
+	    html += "<select id='actuator_select'></select> ";
+	    html += "</div>";
+
+	    $("#main").append(html);
+
+	    //add sensor list on "sensor_select"
+	    var child = $("#"+idbox).children();
+	    for(var i = 0;i<child.length; i++){
+	    	if(child[i].id == "actuator_select"){
+	    		for(var aid in services["actuators"]){
+	    			var optTMP = document.createElement("option");
+	    			optTMP.text = services.actuators[aid].description;
+	    			optTMP.value = aid;
+	    			child[i].options.add(optTMP);
+	    		}
+	    	}
+	    }
+
+	    var d = document.getElementById(idbox);
+		d.style.left = coord.x+'px';
+		d.style.top = coord.y+'px';
+		
+		jsPlumb.addEndpoint(idbox, { anchor:"TopCenter" }, greeCircle());
+    	
+    	var divsWithWindowClass = jsPlumb.CurrentLibrary.getSelector(".window");
+        jsPlumb.draggable(divsWithWindowClass);
+	}
+
+
+	this.getActuatorConfig = function(id){
+		var config = {};
+		var child = $("#"+id).children();
+        for(var j = 0;j<child.length; j++){           
+            if(child[j].id == "actuator_select"){
+        		config.actuator = child[j].value;               
+            }
+        }
+        return config;
+	}
+
+
 /*****************     USER INPUT VALUE    ******************/
 
 	this.GUIUserInputBox = function(coord){
@@ -392,6 +453,9 @@ function GUIBoxHandler() {
 	}
 
 };
+
+
+
 
 
 
