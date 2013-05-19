@@ -7,6 +7,9 @@ function ServiceHandler() {
     var tree = {}; //tree is used to know connections from box node.
     var levels = {}; //id = number of levels - value: list of boxID in there level - used to know function order to invoke
 
+    var productionList = {};
+    var blockList = [];
+
 
     this.getTree = function(){
         return tree;
@@ -29,6 +32,14 @@ function ServiceHandler() {
             outputArgs:["sensorValues"]
         };
 
+        servicesDescription.actuator = {
+            function_name:"setActuatorState",
+            inputBoxes:1,
+            outputBoxes:0,
+            inputArgs:["value","actuator"],
+            outputArgs:[]
+        };
+
         servicesDescription.operation = {
             function_name:"executeOperation",
             inputBoxes:2,
@@ -46,6 +57,213 @@ function ServiceHandler() {
         };
     }
 
+/*****************     ORDINAMENTO   ******************/
+
+    var isInsideProductionsList = function(source, target){
+        for( i in productionList){
+            if(productionList[i].source==source && productionList[i].target==target)
+                return true;
+        }
+        return false;
+    }
+
+
+    var addRootProductions = function(){
+        var n = 0;
+        //I take an input box at a time and find all its productions (connessions)
+        for(var i=0; i<listInputBoxes.length; i++){
+            for(var j=0; j<connections.length;j++){
+                if(connections[j].sourceId == listInputBoxes[i]){
+                    productionList[n] = {
+                        id:n,
+                        source:connections[j].sourceId,
+                        target:connections[j].targetId
+                    };
+                    n++;
+                }
+            }
+        }
+    }
+
+    var addDependencies = function(elementID){
+        var n = Object.keys(productionList).length;
+        //to find dependencies, i roll all connection and take only that with targetId = elementID
+        //obviously, i add production only if it doesn't exist in productionsList
+        for(var j=0; j<connections.length;j++){
+            if(connections[j].targetId == elementID && isInsideProductionsList(connections[j].sourceId,connections[j].targetId)==false){
+                productionList[n] = {
+                    id:n,
+                    source:connections[j].sourceId,
+                    target:connections[j].targetId
+                };
+                n++;
+            }
+        }
+    }
+
+    var addChildren = function(elementID){
+        var n = Object.keys(productionList).length;
+        //to find children, i roll all connenctions and take only that with sourceID = elementID
+        //obviously, i add production only if it doesn't exist in productionsList
+        for(var j=0; j<connections.length;j++){
+            if(connections[j].sourceId == elementID && isInsideProductionsList(connections[j].sourceId,connections[j].targetId)==false){
+                productionList[n] = {
+                    id:n,
+                    source:connections[j].sourceId,
+                    target:connections[j].targetId
+                };
+                n++;
+            }
+        }
+    }
+
+
+    this.createProductions = function(){
+        //STEP 1: Create list of productions:
+        //  - add input productions
+        //  - add dependencies for element on DX of input productions
+        //  - add children for element on DX of input productions
+        //  - repete 2-3 steps while productionList.length == connections.length
+
+        addRootProductions();
+
+        while(Object.keys(productionList).length != connections.length){
+            for( h in productionList){
+                addDependencies(productionList[h].target);
+                addChildren(productionList[h].target);
+            }
+        }
+
+        alert(Object.keys(productionList).length);
+        alert(JSON.stringify(productionList));
+    }
+
+    this.groupByDXElements = function(){
+        //STEP 2: Group productions in block. Every Block have DX elements in common.
+        //  - get first element of productionList and its DX elements
+        //  - find all procudtions that have the same DX elements and create a new block ({id:[list of production id inside the block]})
+        //  - repete 1-2 step while sum of elemnts for all block (inside list) == connections.length
+
+        for(var n in productionList){
+            exist = false;
+
+            //if productionList[n].target is inside blockList -> i search block and insert id of production "n-esima"
+            for(var i=0; i<blockList.length; i++){
+                if(blockList[i].elementTarget==productionList[n].target){
+                    exist=true;
+                    blockList[i].idProdList.push(productionList[n].id);
+                    break;
+                }
+            }
+
+            //if productionList[n].target isn't inside blockList -> i create a new block in blockList
+            if(exist==false){
+                blockList.push({
+                    elementTarget:productionList[n].target,
+                    idProdList:[productionList[n].id]
+                });
+            }
+        }
+
+        alert("Num Block: " + blockList.length);
+        alert("Original Block List" + JSON.stringify(blockList));
+    }
+
+
+    var getDependenciesBlock = function(block, bList){
+
+        var changeOrder = false;
+
+        for(var n=0; n<block.idProdList.length; n++){
+            //find production that have id = block.idProdList[n]
+            //ES: 
+            //  - n=0  -->  production = a-->L
+            //  - n=1  -->  production = i-->L
+            var production = productionList[block.idProdList[n]];
+
+            //i take SX element of production and find block with elementTarget==production.source
+            //if this block not exist --> production.source is an "input" box
+            //and also i must check that i don't have before insert this block (in blockList).
+            isInputBox = true;
+            exist = false;
+            for(var h=0; h<bList.length; h++){
+                if(bList[h].elementTarget == production.source){
+                    //if i'm here, production.source isn't an "input" box
+                    isInputBox = false;
+                    //is bList[h] before insert in blockList?
+                    for(var i=0; i<blockList.length; i++){
+                        if(bList[h].elementTarget == blockList[i].elementTarget){
+                            exist=true;
+                            break;
+                        }
+                    }
+                    if(exist==false){
+                        blockList.push(bList[h]);
+                        changeOrder = true;
+                    }
+                }
+            }
+            if(isInputBox==true){
+                //nothing todo
+            }
+        }
+
+        //insert original block
+        blockList.push(block);
+
+        return changeOrder;
+    }
+
+
+    this.orderBlocks = function(){
+        //STEP 3: I must to order block in base of its dependencies.
+        //ES: 
+        //Image that i have this connections:
+        //          a-->L -  Block_0
+        //          i-->L -  Block_0
+        //          h-->i -  Block_1
+        //With "a" and "h" input boxes.
+        //Because "L" depend by "i", i must order Block_1 before Block_0 (put before the dependencies).
+
+        var changeOrder=true;
+
+        while(changeOrder==true){
+            var orderTMP = [];
+
+            //copy blockList in a tmp list and remove its contents.
+            var blockTMP = blockList;
+            blockList = [];
+
+            for(var i=0; i<blockTMP.length; i++){
+                exist = false;
+                for(var h=0; h<blockList.length; h++){
+                    if(blockTMP[i].elementTarget == blockList[h].elementTarget){
+                        exist=true;
+                        break;
+                    }
+                }
+                if(exist==false){
+                    orderTMP.push(getDependenciesBlock(blockTMP[i],blockTMP));
+                }
+            }
+
+            //count numFalse and set changeOrder variable --> used to stop while cycle
+            var numFalse = 0;
+            for(var t=0;t<orderTMP.length; t++){
+                if(orderTMP[t]==false)
+                    numFalse++;
+            }
+
+            if(numFalse==orderTMP.length)
+                changeOrder = false;
+            else
+                changeOrder = true;
+
+        }
+
+        alert("BlockList Modified: "+ JSON.stringify(blockList));
+
+    }
 
 /*****************     HANDLER TREE   ******************/
 
@@ -112,6 +330,13 @@ function ServiceHandler() {
 
         fillinTree();
 
+        //this.setLevels(0, listInputBoxes);
+
+        //var num_level0 = levels["0"].push();
+
+
+        
+
         var num_levels = 0;
         var treeTMP = tree;
         do{
@@ -122,6 +347,10 @@ function ServiceHandler() {
         }while(myleaves.length!=0);
 
         //alert(JSON.stringify(levels));
+
+        
+
+
     }
 
 
@@ -265,14 +494,6 @@ function ServiceHandler() {
         //alert("functionArguments: " + functionArguments);
         //alert("functionContent: " + functionContent);
 
-
-        /*
-
-            TODO:
-            Problema dell'objReturned --> chiave/valore avrà come valore la stringa "variablex" e non il valore della variabile!
-
-        */
-
         objReturned = "" ;
         //create Output of service
         for(var f=0; f<variableReturned[(max_level-1)].length;f++){
@@ -286,49 +507,31 @@ function ServiceHandler() {
 
         alert("RETURN: " + JSON.stringify(objReturned));
 
-        /*
-
-            TODO:
-            Combine and create string content service function.
-
-        */
-
         //var serviceFunction = "function " + serviceName + "("+functionArguments+"){"+ functionContent +" return "+ objReturned +";}";
         var serviceFunction = "ServiceHandler.prototype."+ serviceName + " = function("+functionArguments+"){ "+ functionContent +" return "+ objReturned +"; }";
         eval(serviceFunction);
-
-        //var func = "function "+ serviceName + " (){ alert('DENTRO FUNZIONE NUOVA!');} ";
-        //this.registerFunction(serviceFunction);
-
-        //window[serviceName]();
-        //eval(serviceInvoked);
-
 
         return 0;
     }
 
 
-    this.registerFunction = function(functionBody) {
-        "use strict";
-        var script = document.createElement("script");
-       /* script.innerHTML = "function " + functionBody;
-        document.body.appendChild(script);
-        */
+    this.createNewService = function(serviceName, configList){
 
-        script.innerHTML = functionBody;
-        document.body.appendChild(script);
-    }
+        var variableReturned = {};
 
-/*
-    this.modifyFunction = function(functionName,functionBody){
-        var old_someFunction = functionName;
+        var functionContent = "";
+        var functionArguments = "";
 
-        var func = "var " + functionName + " = function(){ "++" alert('DENTRO FUNZIONE INIZIALE!');} ";
-        this.registerFunction(func);
+        var variableNumber = 0;
 
+        var numCycle = Object.keys(listInputBoxes).length;
+
+        while(numCycle!=0){
+
+        }
 
     }
-*/
+
 
 /*****************     OPERATION   ******************/
 
@@ -391,7 +594,6 @@ function ServiceHandler() {
     var getSensorValue = function(time, rates, interval, ids){
 
         sensor = services.sensors[ids];
-        alert(JSON.stringify(sensor));
         if(typeof(listSensorValue[ids])!=="undefined"){
             //var service = services[sensor.id];
             alert("VALUE: " + listSensorValue[ids].value);
@@ -406,42 +608,32 @@ function ServiceHandler() {
         return 0;
     }
 
+/*****************     ACTUATOR   ******************/
+
+    var setActuatorState = function(state,aid){
+        actuator = services.actuators[aid];
+        actuator.bind({
+            onBind:function(){
+                var val_array=new Array(); 
+                val_array[0]=parseFloat(state);
+                try{
+                    actuator.setValue(val_array,
+                        function(actuatorEvent){
+                            alert("[ACTUATOR SET STATE] "+JSON.stringify(actuatorEvent));
+                        },
+                        function(actuatorError){
+                            alert("[ERROR] on actuators set state: "+JSON.stringify(actuatorError));
+                        }
+                    );
+                }
+                catch(err){
+                    console.log("Not a valid webinos actuator: " + err.message);
+                }
+            }
+        });
+    }
 
 
 };
 
 
-
-
-
-/*
-
-someFunction = function(str){
-    alert(str);
-}
-
-var old_someFunction = someFunction;
-
-someFunction = function(){
-    alert('Hello');
-    old_someFunction("CIAO!!!");
-    alert('Goodbye');
-}
-
-//CON ARGOMENTI: si usa apply
-
-someFunction = function(str){
-    alert(str);
-}
-
-var old_someFunction = someFunction;
-
-someFunction = function(mystr){
-    alert('Hello');
-    old_someFunction.apply(this, arguments);
-    alert('Goodbye');
-}
-
-
-
-*/

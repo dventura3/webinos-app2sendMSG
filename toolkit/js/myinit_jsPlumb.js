@@ -1,10 +1,48 @@
 //(function() {
 
-   var _initialised = false,
+//giuseppe ficili
+//funzioni inline
+//incapsulamento
+
+    var listInputBoxes = []; //boxes on 0 level
+    var listOutputBoxes = []; //boxes on the last level
+
+    var _initialised = false,
         connections = [],
         updateConnections = function(conn, remove) {
-            if (!remove) connections.push(conn);
+            if (!remove){
+                connections.push(conn);
+                var sid = conn.sourceId.split("_")[0];
+                var tid = conn.targetId.split("_")[0];
+                if(typeof inputBoxes[sid] !== "undefined"){
+                    listInputBoxes.push(conn.sourceId);
+                    listInputBoxes = listInputBoxes.uniq();
+                }
+                if(typeof outputBoxes[tid] !== "undefined"){
+                    listOutputBoxes.push(conn.targetId);
+                    listOutputBoxes = listOutputBoxes.uniq();
+                }
+
+                //alert("[INSERT] Numero degli input boxes: " + listInputBoxes.length);
+                //alert("[INSERT] numero degli output boxes: " + listOutputBoxes.length);
+            }
             else {
+                var s = 0;
+                while(s!=listInputBoxes.length){
+                    if(listInputBoxes[s]==conn.sourceId)
+                        break;
+                    s++;
+                }
+                if(s!=listInputBoxes.length) listInputBoxes.splice(s, 1);
+
+                var t = 0;
+                while(t!=listOutputBoxes.length){
+                    if(listOutputBoxes[t]==conn.targetId)
+                        break;
+                    t++;
+                }
+                if(t!=listOutputBoxes.length) listOutputBoxes.splice(t, 1);
+
                 var idx = -1;
                 for (var i = 0; i < connections.length; i++) {
                     if (connections[i] == conn) {
@@ -111,6 +149,14 @@
             }
         }
     };
+
+
+    Array.prototype.uniq = function uniq() {
+        return this.reduce(function(accum, cur) { 
+            if (accum.indexOf(cur) === -1) accum.push(cur); 
+                return accum; 
+            }, [] );
+    }
 
 
     

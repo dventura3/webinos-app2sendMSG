@@ -1,5 +1,16 @@
 var services = {};
 
+var inputBoxes = {
+    input:0,
+    sensorGUI:1,
+    userInputGUI:2
+};
+
+var outputBoxes = {
+    output:0,
+    actuatorGUI:1
+};
+
 var servicesName = [];
 
 jsPlumb.bind("ready", function() {
@@ -36,6 +47,9 @@ jsPlumb.bind("ready", function() {
 						case "userInputGUI":
 							config = gui.getUIConfig(levels[level][i]);
 							break;
+						case "actuatorGUI":
+							config = gui.getActuatorConfig(levels[level][i]);
+							break;
 						default:
 							break;
 					}
@@ -43,24 +57,14 @@ jsPlumb.bind("ready", function() {
 				}
 			}
 
-			sh.createCombinedService(serviceName, configList);
+			//sh.createCombinedService(serviceName, configList);
+
+			//servicesName.push(serviceName);
 
 
-			servicesName.push(serviceName);
-
-			/*
-			var func = serviceName + " (){ alert('DENTRO FUNZIONE NUOVA!');} ";
-			registerFunction(func);
-
-			window[serviceName]();
-
-			var old_func = func;
-
-			var new_func = serviceName + " (){ alert('ByeBye'); "+ old_func +"} ";
-			registerFunction(new_func);
-
-			window[serviceName]();
-			*/
+			sh.createProductions();
+			sh.groupByDXElements();
+			sh.orderBlocks();
 
 		}
 	});
@@ -68,18 +72,11 @@ jsPlumb.bind("ready", function() {
 
 	$('#btnStartService').click(function() {
 		for(var x=0; x<servicesName.length; x++){
-			var str = "sh." + servicesName[x] + "()";
+			var str = "sh." + servicesName[x] + "(10)";
 			var result = eval(str);
 			alert("result: "+ JSON.stringify(result));
 		}
 	});
 
 });
-
-function registerFunction(functionBody) {
-    "use strict";
-    var script = document.createElement("script");
-    script.innerHTML = "function " + functionBody;
-    document.body.appendChild(script);
-}
 
