@@ -1,27 +1,10 @@
 function ServiceHandler() {
-   	this.myboxes = {};
     this.num = 0;
     var listSensorValue = {};
-
-    var servicesDescription = {};
-    var tree = {}; //tree is used to know connections from box node.
-    var levels = {}; //id = number of levels - value: list of boxID in there level - used to know function order to invoke
 
     var productionList = {};
     var blockList = [];
 
-
-    this.getTree = function(){
-        return tree;
-    }
-
-    this.getLevels = function(){
-        return levels;
-    }
-
-    this.setLevels = function(id, list){
-        levels[id] = list;
-    }
 
     this.init = function(){
         servicesDescription.sensor = {
@@ -275,8 +258,6 @@ function ServiceHandler() {
     this.createCombinedService = function(serviceName, configList){
 
         var listVariables = {};
-
-        var variableReturned = {};
 
         var functionContent = "";
         var functionArguments = "";
