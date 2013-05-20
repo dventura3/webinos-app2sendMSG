@@ -27,44 +27,42 @@ jsPlumb.bind("ready", function() {
 	$('#btnCreateService').click(function() {
 		var serviceName = prompt("What is service name?", "Insert service name here");
 		if(serviceName){
-			sh.createTree();
 
 			services = gui.getService("*");
-		
+
+			var listBoxes = gui.getListOfBox();
+
 			var configList = {};
-			levels = sh.getLevels();
-			for(var level in levels){
-				for(var i=0; i<levels[level].length; i++){
-					var config = {};
-					var boxType = levels[level][i].split("_")[0];
-					switch(boxType){
-						case "operationGUI":
-							config = gui.getOperationConfig(levels[level][i]);
-							break;
-						case "sensorGUI":
-							config = gui.getSensorConfig(levels[level][i]);
-							break;
-						case "userInputGUI":
-							config = gui.getUIConfig(levels[level][i]);
-							break;
-						case "actuatorGUI":
-							config = gui.getActuatorConfig(levels[level][i]);
-							break;
-						default:
-							break;
-					}
-					configList[levels[level][i]] = config;	
+
+			for(var box in listBoxes){
+				var boxType = box.split("_")[0];
+				switch(boxType){
+					case "operationGUI":
+						config = gui.getOperationConfig(box);
+						break;
+					case "sensorGUI":
+						config = gui.getSensorConfig(box);
+						break;
+					case "userInputGUI":
+						config = gui.getUIConfig(box);
+						break;
+					case "actuatorGUI":
+						config = gui.getActuatorConfig(box);
+						break;
+					default:
+						config = {};
+						break;
 				}
+				configList[box] = config;
 			}
-
-			//sh.createCombinedService(serviceName, configList);
-
-			//servicesName.push(serviceName);
-
 
 			sh.createProductions();
 			sh.groupByDXElements();
 			sh.orderBlocks();
+			sh.createCombinedService(serviceName, configList);
+
+			//add service created in service list
+			servicesName.push(serviceName);
 
 		}
 	});

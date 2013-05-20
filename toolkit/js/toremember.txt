@@ -1,0 +1,28 @@
+        //          h-->i -  Block_1
+		//          a-->L -  Block_0
+        //          i-->L -  Block_0
+
+
+
+1) h --> i
+servono 2 variabili + sapere i tipi di entrambi i nodi "h" e "i"
+
+
+
+
+
+PROCEDURA:
+creo listaVaribles={
+	sensorGUI_1 : variable1,  //vriabile associata al blocco e che viene restituita dalla funzione associata al blocco
+	input_2 : variable2
+}
+
+
+- Step 1:
+per tutti i box di input, creo le variabili che inserisco nella "listaVariables" e mi salvo le funzioni in una stringa
+
+- Step 2: 
+scorro 1 blocco alla volta prendendo le variabili da listaVaribles e assegnandole al nuovo metodo
+
+- Step 3:
+come gestisco l'output box??? TODO

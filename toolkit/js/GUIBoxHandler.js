@@ -25,6 +25,16 @@ function GUIBoxHandler() {
 		return {};
 	}
 
+	this.getListOfBox = function(){
+		var list = {};
+        for(var i=0; i<connections.length; i++){
+        	if(typeof list[connections[i].sourceId]=== "undefined")
+        		list[connections[i].sourceId] = connections[i].sourceId;
+        	if(typeof list[connections[i].targetId]=== "undefined")
+        		list[connections[i].targetId] = connections[i].targetId;
+        }
+        return list;
+    }
 
 /*****************     INITIALIZATION   ******************/
 

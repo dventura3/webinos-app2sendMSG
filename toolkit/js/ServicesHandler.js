@@ -57,6 +57,8 @@ function ServiceHandler() {
         };
     }
 
+
+
 /*****************     ORDINAMENTO   ******************/
 
     var isInsideProductionsList = function(source, target){
@@ -134,8 +136,8 @@ function ServiceHandler() {
             }
         }
 
-        alert(Object.keys(productionList).length);
-        alert(JSON.stringify(productionList));
+        //alert(Object.keys(productionList).length);
+        //alert(JSON.stringify(productionList));
     }
 
     this.groupByDXElements = function(){
@@ -165,8 +167,8 @@ function ServiceHandler() {
             }
         }
 
-        alert("Num Block: " + blockList.length);
-        alert("Original Block List" + JSON.stringify(blockList));
+        //alert("Num Block: " + blockList.length);
+        //alert("Original Block List" + JSON.stringify(blockList));
     }
 
 
@@ -261,9 +263,136 @@ function ServiceHandler() {
 
         }
 
-        alert("BlockList Modified: "+ JSON.stringify(blockList));
+        //alert("BlockList Modified: "+ JSON.stringify(blockList));
 
     }
+
+
+/*****************     COMBINED SERVICE   ******************/
+
+
+
+    this.createCombinedService = function(serviceName, configList){
+
+        var listVariables = {};
+
+        var variableReturned = {};
+
+        var functionContent = "";
+        var functionArguments = "";
+        var objReturned = "" ;
+
+        var variableNumber = 0;
+
+
+        //INPUT BOXES
+        for(var i=0; i<listInputBoxes.length; i++){
+
+            //Insert variable in list
+            listVariables[listInputBoxes[i]] = "variable" + variableNumber;
+
+            var boxID = listInputBoxes[i];
+
+            var boxType = listInputBoxes[i].split("_")[0];
+
+            switch(boxType){
+                case "input":
+                    functionArguments += "variable" + variableNumber + ",";
+                    variableNumber++;
+                break;
+                case "sensorGUI":
+                    if(servicesDescription.sensor.inputArgs.length==Object.keys(configList[boxID]).length){
+                        //start
+                        getSensorValue(configList[boxID].time,configList[boxID].rates,configList[boxID].interval,configList[boxID].sensor);
+                        functionContent += "variable" + variableNumber + " = getSensorValue("+configList[boxID].time+","+configList[boxID].rates+",'"+configList[boxID].interval+"','"+configList[boxID].sensor+"');";
+                        variableNumber++;
+                    }else
+                        return -1;
+                break;
+                case "userInputGUI":
+                    if(Object.keys(configList[boxID]).length==1 && configList[boxID]!=[]){
+                        functionContent += "variable" + variableNumber + " = "+configList[boxID].ui +";";
+                        variableNumber++;
+                    }else
+                        return -1;
+                break;
+                default:
+                break;
+            }
+        }
+
+
+        //MIDLE BOXES
+        for(var j=0; j<blockList.length; j++){
+
+            var production = productionList[blockList[j].idProdList[0]];
+
+            var boxID = production.target;
+
+            var boxType = production.target.split("_")[0];
+
+            switch(boxType){
+                case "operationGUI":
+                    //verify that connection are ok --> infact i must have 2 input connection
+                    if(servicesDescription.operation.inputBoxes==blockList[j].idProdList.length){
+                        var left = "";
+                        var right = "";
+
+                        for (var k=0; k<connections.length; k++) {
+                            if(connections[k].targetId==boxID){
+                                var params = connections[k].getParameters();
+                                if(params.position=="left")
+                                    left = listVariables[connections[k].sourceId];
+                                else
+                                    right = listVariables[connections[k].sourceId];
+                            }
+                        }
+                        
+                        listVariables[boxID] = "variable" + variableNumber;
+                        functionContent += "variable" + variableNumber + " = executeOperation("+left+","+right+",'"+configList[boxID].operation+"');";
+                        variableNumber++;                         
+
+                    }else
+                        return -1;
+                break;
+                case "actuatorGUI":
+                    if(blockList[j].idProdList.length==1){
+                        //get name of variable in up level
+                        var variableUPlevel = listVariables[production.source]; 
+                        functionContent += "variable" + variableNumber + " = setActuatorState("+variableUPlevel+",'"+configList[boxID].actuator+"');";
+                        listVariables[boxID] = "variable" + variableNumber;
+                        variableNumber++;
+                    }
+                break;
+                case "output":
+                    for(var f=0; f<blockList[j].idProdList.length; f++){
+                        var productionTMP = productionList[blockList[j].idProdList[f]];
+                        objReturned += "'" + productionTMP.source + "':" +listVariables[productionTMP.source] +",";
+                    }
+                break;
+                default:
+                break;
+            }
+        }
+
+
+        //remove the last ","
+        functionArguments = functionArguments.substr(0, functionArguments.length-1);
+        alert("functionArguments: " + functionArguments);
+        alert("functionContent: " + functionContent);
+
+        //remove the last ","
+        objReturned = objReturned.substr(0, objReturned.length-1);
+        objReturned = "{" + objReturned + "}";
+        alert("RETURN: " + JSON.stringify(objReturned));
+
+        var serviceFunction = "ServiceHandler.prototype."+ serviceName + " = function("+functionArguments+"){ "+ functionContent +" return "+ objReturned +"; }";
+        eval(serviceFunction);
+
+        return 0;
+
+    }
+
 
 /*****************     HANDLER TREE   ******************/
 
@@ -356,7 +485,7 @@ function ServiceHandler() {
 
 /*****************     COMBINED SERVICE   ******************/
 
-
+/*
     this.createCombinedService = function(serviceName, configList){
 
         var variableReturned = {};
@@ -532,6 +661,8 @@ function ServiceHandler() {
 
     }
 
+
+*/
 
 /*****************     OPERATION   ******************/
 
