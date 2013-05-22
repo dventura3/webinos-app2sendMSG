@@ -65,6 +65,7 @@ function searchMyChannel(channelNamespace){
             // callback invoked when the search query is accepted for processing
             function(success) {
                 // ok, but no action needed in our example
+                alert("[CLIENT] success callback for query to search channel");
             },
             // callback invoked when search query could not be processed.
             function(error) {
