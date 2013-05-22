@@ -34,40 +34,6 @@ jQuery(document).ready(function() {
     	sendMessageTo(message);
 	});
 
-
-/*
-    boxes = new BoxHandler();
-    sHandler = new ServiceHandler();
-
-
-    $('#btnCreateService').click(function() {
-        var all_boxes = $('#target').children();
-        for(var i = 0;i<all_boxes.length; i++) {
-            alert(all_boxes[i].id);
-
-            //es: sensorGUI_1 split result --> sensorGUI  and  1
-            var box_type = all_boxes[i].id.split("_")[0];
-
-            if(box_type == "sensorGUI"){
-                var child = $("#"+all_boxes[i].id).children();
-                for(var j = 0;j<child.length; j++){
-                    if(child[j].id == "sensor_select"){
-                        //var sid = sem.deserialize(child[j].value);
-                        var service = services[child[j].value];
-                        //alert(child[j].value);
-                        alert(JSON.stringify(service));
-
-                        getSensorValue(120,500,"fixedinterval",service);
-                        
-                    }
-                }
-            }
-            
-        }
-    });
-
-*/
-
 });
 
 
@@ -174,31 +140,4 @@ function sendMessageTo(message) {
             alert("[CLIENT] Could not send message: " + error.message);
         }
     );
-}
-
-var make_operation = function(parameter_1, parameter_2, operation){
-    switch (operation){
-        case "sum":
-            return parseInt(parameter_1) + parseInt(parameter_2);
-        case "subtraction":
-            return parseInt(parameter_1) - parseInt(parameter_2);
-        case "multiplication":
-            return parseInt(parameter_1) * parseInt(parameter_2);
-        case "division":
-            return parseInt(parameter_1) / parseInt(parameter_2);
-        default:
-            return 0;
-    }
-}
-
-function btn_operation(){
-    $("#operation_result").empty();
-
-    var par1 = $("#parameter_1").val();
-    var par2 = $("#parameter_2").val();
-    var value_selected = document.getElementById('operation_select').value;
-
-    var result = make_operation(par1,par2,value_selected);
-
-    $("#operation_result").append(result);
 }

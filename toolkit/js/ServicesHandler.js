@@ -2,6 +2,8 @@ function ServiceHandler() {
     this.num = 0;
     var listSensorValue = {};
 
+    var servicesDescription = {};
+
     var productionList = {};
     var blockList = [];
 

@@ -8,8 +8,6 @@
 
         <!-- my JAVASCRIPT -->
         <script src="/webinos.js"></script>
-        <script type="text/javascript" src="js/box_handler.js"></script>
-        <script type="text/javascript" src="js/service_handler.js"></script>
         <script type="text/javascript" src="js/main.js"></script>
 
     </head>
@@ -32,65 +30,6 @@
 
         <br><br><br>
         <br><br><br>
-<!--
-        <div id="main">
-            <div id="target">
-                <div class="window" id="window1">
-                    one<br/><br/>
-                    <a href="#" class="cmdLink hide" rel="window1">toggle connections</a><br/>
-                    <a href="#" class="cmdLink drag" rel="window1">disable dragging</a><br/>
-                    <a href="#" class="cmdLink detach" rel="window1">detach all</a>
-                </div>
-            </div>
-        </div>
--->
-
-        <div id="target"></div>
-        <div id="main">
-            <div id="render"></div>
-            <div class="window" id="window1">one<br/><br/><a href="#" class="cmdLink hide" rel="window1">toggle connections</a><br/><a href="#" class="cmdLink drag" rel="window1">disable dragging</a><br/><a href="#" class="cmdLink detach" rel="window1">detach all</a></div>
-        </div>
-
-        <br><br><br>
-
-        <div id="boxes">
-            <div id="box_sensor" draggable="true" style="height:70px; float:left; border: 1px solid #ff0000; margin: 0px 20px 0px 0px ;">
-                <h2>Sensor</h2>
-            </div>
-
-            <div id="box_operation" draggable="true" style="height:70px; float:left; border: 1px solid #ff0000; margin: 0px 20px 0px 0px ;">
-                <h2>Operation</h2>
-            </div>
-
-            <div id="box_userInput" draggable="true" style="height:70px; float:left; border: 1px solid #ff0000; margin: 0px 20px 0px 0px ;">
-                <h2>User Input</h2>
-            </div>
-        </div>
-
-        <br><br><br>
-        <br><br><br>
-
-        Service Name: <input type='text' id='service_name' />
-        <button id="btnCreateService">Create Service</button>
-
-        <br><br><br>
-        <br><br><br>
-        <h1>TO REMOVE</h1>
-
-        <div id="container_operational_box" style="border: 1px solid #0000ff; border-radius: 5px;">
-            <input type="text" id="parameter_1" />
-            <input type="text" id="parameter_2" />
-            <select id="operation_select">
-                <option value="sum"> + </option>
-                <option value="subtraction"> - </option>
-                <option value="multiplication"> * </option>
-                <option value="division"> / </option>
-            </select>
-            <input type="button" value="Calculate" onclick="btn_operation()">
-            <div id="operation_result"></div>
-        </div>
-
-        <br>
 
     </body>
 </html>
